@@ -8,13 +8,13 @@ namespace SimpleSiteCrawler.Cli
     {
         private const string DefaultPageName = "index";
         private const string DefaultPageExt = ".htm";
-        
 
         public static void SaveResult(string downloadToFolder, SitePage page)
         {
             EnsureDirectoryExists(downloadToFolder);
 
-            var path = MakePath(page.Uri.AbsolutePath == "/" ? DefaultPageName : page.Uri.AbsolutePath) + DefaultPageExt;
+            var path = MakePath(page.Uri.AbsolutePath == "/" ? DefaultPageName : page.Uri.AbsolutePath) +
+                       DefaultPageExt;
             var fileAbsPath = Path.Combine(downloadToFolder, path);
 
             if (File.Exists(fileAbsPath))
