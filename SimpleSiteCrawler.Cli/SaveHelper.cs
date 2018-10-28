@@ -8,6 +8,30 @@ namespace SimpleSiteCrawler.Cli
     {
         private const string DefaultPageName = "index";
         private const string DefaultPageExt = ".htm";
+        
+        private static Regex _invalidCharsRegex;
+        private static readonly object LockObj = new object();
+
+        private static Regex InvalidCharsRegex
+        {
+            get
+            {
+                if (_invalidCharsRegex == null)
+                {
+                    lock (LockObj)
+                    {
+                        if (_invalidCharsRegex == null)
+                        {
+                            var regexSearch = new string(Path.GetInvalidFileNameChars()) +
+                                              new string(Path.GetInvalidPathChars());
+                            _invalidCharsRegex = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
+                        }
+                    }
+                }
+
+                return _invalidCharsRegex;
+            }
+        }
 
         public static void SaveResult(string downloadToFolder, SitePage page)
         {
@@ -30,13 +54,9 @@ namespace SimpleSiteCrawler.Cli
             }
         }
 
-        public static string MakePath(string absoluteUriPath)
-        {
-            var regexSearch = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
-            var r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
 
-            return r.Replace(absoluteUriPath, "_").TrimStart('_');
-        }
+        public static string MakePath(string absoluteUriPath) =>
+            InvalidCharsRegex.Replace(absoluteUriPath, "_").TrimStart('_');
 
         private static void EnsureDirectoryExists(string downloadToFolder)
         {

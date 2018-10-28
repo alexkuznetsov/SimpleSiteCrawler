@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Text;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace SimpleSiteCrawler.Cli
 {
@@ -12,38 +13,44 @@ namespace SimpleSiteCrawler.Cli
             , Action<string> onParseOptionError
             , Action<Exception> onError)
         {
-            var argsNotNull = args != null;
             var options = new Options
             {
-                Site = argsNotNull && args.Length >= 1 ? args[0]?.Trim() : null,
-                DownloadsFolderName = argsNotNull && args.Length >= 2 ? args[1]?.Trim() : DefaultDownloadsFolderName
+                Site = args.GetValueSafe(0),
+                DownloadsFolderName = args.GetValueSafe(1) ??
+                                      DefaultDownloadsFolderName
             };
 
-            if (string.IsNullOrEmpty(options.Site))
+            if (!IsOptionsValid(options, onParseOptionError)) return;
+
+            try
             {
-                var stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine("Please, provide site to download!");
-                stringBuilder.AppendLine("Example: dotnet SimpleSiteCrawler.Cli.dll https://codyhouse.co/");
-                onParseOptionError?.Invoke(stringBuilder.ToString());
+                onSuccess?.Invoke(options);
             }
-            else if (string.IsNullOrEmpty(options.DownloadsFolderName))
+            catch (Exception e)
             {
-                var stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine("Please, provide valid folder name!");
-                stringBuilder.AppendLine("Example: dotnet SimpleSiteCrawler.Cli.dll https://codyhouse.co/ downloads");
-                onParseOptionError?.Invoke(stringBuilder.ToString());
-            }
-            else
-            {
-                try
-                {
-                    onSuccess?.Invoke(options);
-                }
-                catch (Exception e)
-                {
-                    onError?.Invoke(e);
-                }
+                onError?.Invoke(e);
             }
         }
+
+        private static bool IsOptionsValid(Options options, Action<string> onParseOptionError)
+        {
+            var validationContext = new ValidationContext(options);
+            var errors = new List<ValidationResult>();
+            var isValid = Validator.TryValidateObject(options, validationContext, errors, true);
+
+            if (isValid) return true;
+
+            var errorHandler = CreateError(onParseOptionError);
+
+            foreach (var error in errors)
+            {
+                errorHandler.Add(error.ToString());
+            }
+
+            errorHandler.Rise();
+            return false;
+        }
+
+        private static ErrorContext CreateError(Action<string> handler) => new ErrorContext(handler);
     }
 }

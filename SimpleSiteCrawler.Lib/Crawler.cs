@@ -28,9 +28,11 @@ namespace SimpleSiteCrawler.Lib
 
         public event EventHandler<SitePage> OnPageDownloadBegin;
 
-        public event EventHandler<SitePage> OnPageDownloadCompleate;
+        public event EventHandler<SitePage> OnPageDownloadComplete;
 
-        public event EventHandler OnDownloadCompleated;
+        public event EventHandler OnDownloadCompleted;
+
+        public event EventHandler<Exception> OnError;
 
         public void Execute()
         {
@@ -46,7 +48,7 @@ namespace SimpleSiteCrawler.Lib
             {
                 OnPageDownloadBegin?.Invoke(this, sitePage);
                 await Downloader.Execute(sitePage);
-                OnPageDownloadCompleate?.Invoke(this, sitePage);
+                OnPageDownloadComplete?.Invoke(this, sitePage);
                 var result = SitePageTemplateExtractor.FindAll(StartPage.Uri, sitePage.Contents, _filters);
 
                 result.ForEach(async i =>
@@ -57,12 +59,11 @@ namespace SimpleSiteCrawler.Lib
             }
             catch (Exception exc)
             {
-                Console.WriteLine(exc.ToString());
-                // ignored now, but can be logged
+                OnError?.Invoke(this, exc);
             }
 
             if (Interlocked.Decrement(ref _numberOfLinksLeft) == 0)
-                OnDownloadCompleated?.Invoke(this, EventArgs.Empty);
+                OnDownloadCompleted?.Invoke(this, EventArgs.Empty);
         }
     }
 }

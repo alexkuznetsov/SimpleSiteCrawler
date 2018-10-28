@@ -11,14 +11,14 @@ namespace SimpleSiteCrawler.Lib
                 uri = new Uri(href);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 try
                 {
                     uri = new Uri('/'+href);
                     return true;
                 }
-                catch (Exception exception)
+                catch (Exception)
                 {
                     uri = null;
                     return false;

@@ -19,10 +19,10 @@ namespace SimpleSiteCrawler.Cli
                 Uri = new Uri(options.Site)
             });
 
-            crawler.OnDownloadCompleated += (s, e) => Logger.Info("Download compleated!");
+            crawler.OnDownloadCompleted += (s, e) => Logger.Info("Download completed!");
             crawler.OnPageDownloadBegin += (s, p) => Logger.Info($"{p.Uri} download start");
-            crawler.OnPageDownloadCompleate += (s, p) => Logger.Info($"[OK] {p.Uri.AbsolutePath}");
-            crawler.OnPageDownloadCompleate += (s, p) => SaveHelper.SaveResult(downloadToFolder, p);
+            crawler.OnPageDownloadComplete += (s, p) => Logger.Info($"[OK] {p.Uri.AbsolutePath}");
+            crawler.OnPageDownloadComplete += (s, p) => SaveHelper.SaveResult(downloadToFolder, p);
 
             crawler.Execute();
         }

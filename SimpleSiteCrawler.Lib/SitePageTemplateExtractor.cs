@@ -11,12 +11,12 @@ namespace SimpleSiteCrawler.Lib
     internal static class SitePageTemplateExtractor
     {
         private const string DocType = "XHTML";
-        private const string AnkhorXpath = @"//a";
+        private const string AnchorXpath = @"//a";
         private const string HrefAttribute = "href";
 
         public static List<SitePage> FindAll(Uri startUri, string pageSource, IEnumerable<ISitePageFilter> filters)
         {
-            var nodeIterator = CreateAnkhorIterator(pageSource);
+            var nodeIterator = CreateAnchorIterator(pageSource);
             var extracted = Extract(startUri, nodeIterator);
             var collected = Filter(extracted, filters)
                 .ToList();
@@ -24,11 +24,11 @@ namespace SimpleSiteCrawler.Lib
             return collected;
         }
 
-        private static XPathNodeIterator CreateAnkhorIterator(string pageSource)
+        private static XPathNodeIterator CreateAnchorIterator(string pageSource)
         {
             return CreateXmlDocument(pageSource)
                 .CreateNavigator()
-                .Select(AnkhorXpath);
+                .Select(AnchorXpath);
         }
 
         private static XmlDocument CreateXmlDocument(string html)
@@ -41,7 +41,7 @@ namespace SimpleSiteCrawler.Lib
             }
         }
 
-        private static XmlDocument CreateAndLoadXml(SgmlReader sgmlReader)
+        private static XmlDocument CreateAndLoadXml(XmlReader sgmlReader)
         {
             var doc = new XmlDocument
             {
@@ -64,6 +64,7 @@ namespace SimpleSiteCrawler.Lib
             };
         }
 
+        // TODO: Refactor this
         private static IEnumerable<SitePage> Extract(Uri baseUri, XPathNodeIterator allNodes)
         {
             var list = new List<SitePage>();

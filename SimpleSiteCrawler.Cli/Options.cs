@@ -2,8 +2,8 @@
 {
     internal class Options
     {
-        public string Site { get; set; }
+        [UrlWithHelp("https://codyhouse.co/")] public string Site { get; set; }
 
-        public string DownloadsFolderName { get; set; }
+        [FolderName] public string DownloadsFolderName { get; set; }
     }
 }
