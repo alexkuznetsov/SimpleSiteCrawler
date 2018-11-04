@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 
 namespace SimpleSiteCrawler.Cli
 {
@@ -34,23 +35,29 @@ namespace SimpleSiteCrawler.Cli
 
         private static bool IsOptionsValid(Options options, Action<string> onParseOptionError)
         {
+            var state = GetValidationState(options);
+
+            if (state.Item1) return state.Item1;
+            
+            var buffer = new StringBuilder();
+
+            foreach (var error in state.Item2)
+            {
+                buffer.AppendLine(error.ToString());
+            }
+
+            onParseOptionError?.Invoke(buffer.ToString());
+
+            return state.Item1;
+        }
+
+        private static (bool, IEnumerable<ValidationResult>) GetValidationState(Options options)
+        {
             var validationContext = new ValidationContext(options);
             var errors = new List<ValidationResult>();
             var isValid = Validator.TryValidateObject(options, validationContext, errors, true);
 
-            if (isValid) return true;
-
-            var errorHandler = CreateError(onParseOptionError);
-
-            foreach (var error in errors)
-            {
-                errorHandler.Add(error.ToString());
-            }
-
-            errorHandler.Rise();
-            return false;
+            return (isValid, errors);
         }
-
-        private static ErrorContext CreateError(Action<string> handler) => new ErrorContext(handler);
     }
 }

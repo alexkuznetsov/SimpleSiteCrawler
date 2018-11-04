@@ -21,7 +21,8 @@ namespace SimpleSiteCrawler.Lib
             {
                 using (var reader = new StreamReader(stream, Encoding.UTF8))
                 {
-                    return await reader.ReadToEndAsync();
+                    return await reader.ReadToEndAsync()
+                        .ConfigureAwait(false);
                 }
             }
         }

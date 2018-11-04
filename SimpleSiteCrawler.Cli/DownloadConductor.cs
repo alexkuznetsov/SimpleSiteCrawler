@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using SimpleSiteCrawler.Lib;
 
 namespace SimpleSiteCrawler.Cli
@@ -12,8 +11,6 @@ namespace SimpleSiteCrawler.Cli
 
         public static void Start(Options options)
         {
-            var downloadToFolder = GetDownloadFolderPath(options);
-
             var crawler = new Crawler(new SitePage
             {
                 Uri = new Uri(options.Site)
@@ -22,14 +19,9 @@ namespace SimpleSiteCrawler.Cli
             crawler.OnDownloadCompleted += (s, e) => Logger.Info("Download completed!");
             crawler.OnPageDownloadBegin += (s, p) => Logger.Info($"{p.Uri} download start");
             crawler.OnPageDownloadComplete += (s, p) => Logger.Info($"[OK] {p.Uri.AbsolutePath}");
-            crawler.OnPageDownloadComplete += (s, p) => SaveHelper.SaveResult(downloadToFolder, p);
+            crawler.OnPageDownloadComplete += (s, p) => SaveHelper.SaveResult(options, p);
 
             crawler.Execute();
         }
-
-        private static string GetCurrentFolder() => Path.GetDirectoryName(typeof(Program).Assembly.Location);
-
-        private static string GetDownloadFolderPath(Options options) =>
-            Path.Combine(GetCurrentFolder(), options.DownloadsFolderName, SaveHelper.MakePath(options.Site));
     }
 }

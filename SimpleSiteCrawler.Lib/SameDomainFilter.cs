@@ -21,8 +21,6 @@ namespace SimpleSiteCrawler.Lib
         }
 
         private bool IsHostSame(SitePage sitePage)
-        {
-            return _root.Host == sitePage.Uri.Host;
-        }
+            => _root.Host == sitePage.Uri.Host;
     }
 }

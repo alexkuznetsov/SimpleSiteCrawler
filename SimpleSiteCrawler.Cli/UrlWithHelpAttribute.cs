@@ -6,7 +6,7 @@ using System.Reflection;
 namespace SimpleSiteCrawler.Cli
 {
     [AttributeUsage(AttributeTargets.Property |
-                    AttributeTargets.Field, AllowMultiple = false)]
+                    AttributeTargets.Field)]
     public sealed class UrlWithHelpAttribute : DataTypeAttribute
     {
         private readonly string _helpUri;

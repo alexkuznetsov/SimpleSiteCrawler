@@ -72,9 +72,9 @@ namespace SimpleSiteCrawler.Lib
             {
                 var current = allNodes.Current;
                 var href = current?.GetAttribute(HrefAttribute, string.Empty);
-                
+
                 if (string.IsNullOrEmpty(href)) continue;
-                
+
                 if (!HttpUtils.TryParseUri(href, out var uri))
                     continue;
 
@@ -97,13 +97,9 @@ namespace SimpleSiteCrawler.Lib
         }
 
         private static bool IsUriSchemaAllowed(Uri uri)
-        {
-            return uri.Scheme == Uri.UriSchemeFile || uri.Scheme.Contains(Uri.UriSchemeHttp);
-        }
+            => uri.Scheme == Uri.UriSchemeFile || uri.Scheme.Contains(Uri.UriSchemeHttp);
 
         private static IEnumerable<SitePage> Filter(IEnumerable<SitePage> uris, IEnumerable<ISitePageFilter> allFilters)
-        {
-            return allFilters.Aggregate(uris, (current, filter) => filter.Apply(current));
-        }
+            => allFilters.Aggregate(uris, (current, filter) => filter.Apply(current));
     }
 }
