@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SimpleSiteCrawler.Lib
+namespace SimpleSiteCrawler.Lib.Filter
 {
     internal class SameDomainFilter : ISitePageFilter
     {

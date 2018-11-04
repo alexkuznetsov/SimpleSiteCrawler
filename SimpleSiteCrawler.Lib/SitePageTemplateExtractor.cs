@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
 using Sgml;
+using SimpleSiteCrawler.Lib.Filter;
 
 namespace SimpleSiteCrawler.Lib
 {

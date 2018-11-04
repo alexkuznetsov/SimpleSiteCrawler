@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace SimpleSiteCrawler.Lib
+namespace SimpleSiteCrawler.Lib.Filter
 {
-    internal interface ISitePageFilter
+    public interface ISitePageFilter
     {
         IEnumerable<SitePage> Apply(IEnumerable<SitePage> input);
     }

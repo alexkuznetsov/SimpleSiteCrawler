@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SimpleSiteCrawler.Lib.Filter;
 
 namespace SimpleSiteCrawler.Lib
 {
@@ -10,21 +11,18 @@ namespace SimpleSiteCrawler.Lib
 
         private readonly ISitePageFilter[] _filters;
 
-        public Crawler(SitePage startPage)
-            : this(startPage
-                , new ExcludeRootSitePageFilter(startPage.Uri)
-                , new SameDomainFilter(startPage.Uri)
-                , new AlreadyVisitedSitePageFilter())
-        {
-        }
+        public static Crawler CreateDefault(Uri rootUri)
+            => new Crawler(new ISitePageFilter[]
+            {
+                new ExcludeRootSitePageFilter(rootUri),
+                new SameDomainFilter(rootUri),
+                new AlreadyVisitedSitePageFilter()
+            });
 
-        private Crawler(SitePage startPage, params ISitePageFilter[] filters)
+        private Crawler(ISitePageFilter[] filters)
         {
-            StartPage = startPage;
             _filters = filters;
         }
-
-        private SitePage StartPage { get; }
 
         public event EventHandler<SitePage> OnPageDownloadBegin;
 
@@ -34,28 +32,20 @@ namespace SimpleSiteCrawler.Lib
 
         public event EventHandler<Exception> OnError;
 
-        public void Execute()
-        {
-            var task = CrawlAsync(StartPage);
-
-            if (!task.IsCompleted)
-                task.Start();
-        }
-
-        private async Task CrawlAsync(SitePage sitePage)
+        public async Task CrawlAsync(SitePage sitePage)
         {
             try
             {
                 OnPageDownloadBegin?.Invoke(this, sitePage);
                 await Downloader.Execute(sitePage);
                 OnPageDownloadComplete?.Invoke(this, sitePage);
-                var result = SitePageTemplateExtractor.FindAll(StartPage.Uri, sitePage.Contents, _filters);
 
-                result.ForEach(async i =>
-                {
-                    Interlocked.Increment(ref _numberOfLinksLeft);
-                    await CrawlAsync(i);
-                });
+                SitePageTemplateExtractor.FindAll(sitePage.Uri, sitePage.Contents, _filters)
+                    .ForEach(async i =>
+                    {
+                        Interlocked.Increment(ref _numberOfLinksLeft);
+                        await CrawlAsync(i);
+                    });
             }
             catch (Exception exc)
             {

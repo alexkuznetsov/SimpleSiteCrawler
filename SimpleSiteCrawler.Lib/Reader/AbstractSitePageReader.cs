@@ -2,7 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SimpleSiteCrawler.Lib
+namespace SimpleSiteCrawler.Lib.Reader
 {
     internal abstract class AbstractSitePageReader : ISitePageReader
     {

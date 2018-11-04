@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
 
-namespace SimpleSiteCrawler.Lib
+namespace SimpleSiteCrawler.Lib.Filter
 {
     internal class AlreadyVisitedSitePageFilter : ISitePageFilter
     {

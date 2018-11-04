@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace SimpleSiteCrawler.Lib
+namespace SimpleSiteCrawler.Lib.Reader
 {
     internal interface ISitePageReader
     {
