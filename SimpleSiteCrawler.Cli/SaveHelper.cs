@@ -32,7 +32,7 @@ namespace SimpleSiteCrawler.Cli
                 return _invalidCharsRegex;
             }
         }
-
+        
         public static void SaveResult(Options options, SitePage page)
         {
             var downloadToFolder = GetDownloadFolderPath(options);

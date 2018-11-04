@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using SimpleSiteCrawler.Lib.Reader;
+using System.Linq;
 
 namespace SimpleSiteCrawler.Lib
 {
@@ -18,7 +19,21 @@ namespace SimpleSiteCrawler.Lib
 
         public static async Task Execute(SitePage page)
         {
-            var request = WebRequest.CreateHttp(page.Uri);
+            page.Contents = await Download(page.Uri);
+
+            if (!page.MediaUrl.IsEmpty)
+            {
+                await Task.WhenAll(page.MediaUrl.Select(async x =>
+                {
+                    var content = await Download(x.Key);
+                    page.MediaUrl.AddOrUpdate(x.Key, content, (k, v) => content);
+                }));
+            }
+        }
+
+        private static async Task<string> Download(Uri uri)
+        {
+            var request = WebRequest.CreateHttp(uri);
 
             request.Accept = AcceptAllowAll;
             request.AllowAutoRedirect = true;
@@ -30,7 +45,7 @@ namespace SimpleSiteCrawler.Lib
 
             using (var response = (HttpWebResponse) request.GetResponse())
             {
-                page.Contents = await SitePageReaderFactory.Create(response).Read();
+                return await SitePageReaderFactory.Create(response).Read();
             }
         }
     }
